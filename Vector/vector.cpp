@@ -58,8 +58,6 @@ vector<data_t> :: ~vector ()
     clear (poison);
     DELETE (data);
 
-    size = SIZE_DESTRUCT;
-
     PRINT_LOGS_VTR ("Vector %8d [%8d] was destroyed", this, data);
 
     data = NULL;
@@ -79,6 +77,27 @@ const data_t &vector<data_t> :: at (size_t index) const
         PRINT_LOGS_VTR ("ERROR index %d out of range", index);
         return poison;
     }
+    else if (index < 0)
+    {
+        PRINT_LOGS_VTR ("ERROR index %d less that zero", index);
+        return poison;
+    }
+    return data[index];
+}
+
+template <typename data_t>
+data_t &vector<data_t> :: at (size_t index)
+{
+    if (index >= size)
+    {
+        PRINT_LOGS_VTR ("ERROR index %d out of range", index);
+        return poison;
+    }
+    else if (index < 0)
+    {
+        PRINT_LOGS_VTR ("ERROR index %d less that zero", index);
+        return poison;
+    }
     return data[index];
 }
 
@@ -90,49 +109,40 @@ int vector<data_t> :: clear (data_t content)
         data[i] = content;
     }
 
+    size = 0;
+
     PRINT_LOGS_VTR ("Vector %8d [%8d] was cleared with %d", this, data, content);
 
     return 0;
 }
 
+template <typename type>
+type min (type arg1, type arg2)
+{
+    if (arg1 < arg2)
+        return arg1;
+    else
+        return arg2;
+}
+
 template <typename data_t>
 int vector<data_t> :: resize (size_t count)
 {
-    if (size < count)
-    {
-        data_t *new_data = NEW data_t [count]{0};
-        for (int i = 0; i < size; i++)
-        {
-            new_data[i] = data[i];
-        }
-        clear (poison);
-        DELETE (data);
+   data_t *new_data = NEW data_t [count]{0};
+   size_t temp = min (count,size);
+   for (int i = 0; i < temp; i++)
+   {
+       new_data[i] = data[i];
+   }
+   clear (poison);
+   DELETE (data);
 
-        data = new_data;
-        size = count;
+   data = new_data;
+   size = count;
 
-        PRINT_LOGS_VTR ("Vector %8d [%8d] size was changed to %d", this, data, count);
+   PRINT_LOGS_VTR ("Vector %8d [%8d] size was changed to %d", this, data, count);
 
-        return 0;
-    }
-    if (size > count)
-    {
-        data_t *new_data = NEW data_t [count]{0};
-        for (int i = 0; i < count; i++)
-        {
-            new_data[i] = data[i];
-        }
-
-        clear (poison);
-        DELETE (data);
-
-        data = new_data;
-        size = count;
-
-        PRINT_LOGS_VTR ("Vector %8d [%8d] size was changed to %d", this, data, count);
-
-        return 0;
-    }
+   return 0;
 }
 
 template <typename data_t>
@@ -142,7 +152,13 @@ data_t & vector<data_t> :: operator[] (size_t index)
 }
 
 template <typename data_t>
-const vector<data_t> & vector<data_t> ::  operator= (const vector & that)
+const data_t & vector<data_t> :: operator[] (size_t index) const
+{
+    return data[index];
+}
+
+template <typename data_t>
+vector<data_t> & vector<data_t> ::  operator= (const vector & that)
 {
     vector copy = that;
     swap(copy);
@@ -153,7 +169,7 @@ const vector<data_t> & vector<data_t> ::  operator= (const vector & that)
 }
 
 template <typename data_t>
-const vector<data_t> & vector<data_t> :: operator= (vector && that)
+vector<data_t> & vector<data_t> :: operator= (vector && that)
 {
     swap(that);
 
