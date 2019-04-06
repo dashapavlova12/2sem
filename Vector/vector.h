@@ -35,7 +35,7 @@ public:
     ~vector ();
 
     int swap (vector & that);
-    int clear (data_t content = 0);
+    int clear (data_t content);
     int resize (size_t count);
     const data_t &at (size_t index) const;
     data_t &at (size_t index);
